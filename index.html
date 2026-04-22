@@ -6,132 +6,70 @@
   <title>Soib Ai - Studio</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
-  <style>
-    @keyframes shimmer { 100% { transform: translateX(50%); } }
-    @keyframes scanline { 0% { top: 0; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-  </style>
 </head>
-<body class="bg-gradient-to-br from-[#2e1065] via-[#0a0514] to-[#1e0a3c] text-white font-sans min-h-screen relative">
-  
-  <header class="fixed top-0 w-full z-50 bg-black/40 backdrop-blur-xl">
-    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-center">
-      <div class="flex items-center gap-2">
-        <i data-lucide="zap" class="w-5 h-5 text-cyan-400"></i>
-        <h1 class="text-xl font-bold tracking-widest bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-purple-500">SOIB AI</h1>
-      </div>
-    </div>
+<body class="bg-gradient-to-br from-[#2e1065] via-[#0a0514] to-[#1e0a3c] text-white min-h-screen">
+  <header class="p-6 text-center">
+    <h1 class="text-xl font-bold tracking-widest text-cyan-400">SOIB AI</h1>
   </header>
-
-  <main class="relative z-10 max-w-5xl mx-auto px-6 pt-28 pb-16 flex flex-col gap-6 items-center">
-    <div class="w-full max-w-3xl bg-white/[0.02] rounded-3xl p-6 md:p-8 backdrop-blur-md shadow-2xl flex flex-col gap-8 relative overflow-hidden">
-      
-      <div class="flex justify-center w-full">
-        <div class="inline-flex items-center gap-2 px-4 py-2 bg-black/40 rounded-full">
-          <i data-lucide="wand-2" class="w-4 h-4 text-purple-400"></i>
-          <span class="text-sm font-medium text-gray-300">Status: <span class="text-cyan-400 font-bold">Siap Tempur</span></span>
-        </div>
-      </div>
-
-      <div id="dropzone" class="relative w-full h-32 transition-all flex flex-col items-center justify-center cursor-pointer border-2 border-dashed border-white/10 rounded-2xl hover:bg-white/5" onclick="document.getElementById('fileInput').click()">
+  <main class="max-w-xl mx-auto px-6 py-10 flex flex-col gap-6">
+    <div class="bg-white/5 p-6 rounded-3xl backdrop-blur-xl shadow-2xl flex flex-col gap-6">
+      <div id="dropzone" class="h-32 border-2 border-dashed border-white/20 rounded-2xl flex items-center justify-center cursor-pointer" onclick="document.getElementById('fileInput').click()">
         <input type="file" id="fileInput" class="hidden" multiple accept="image/*">
-        <div id="uploadText" class="flex flex-col items-center gap-2">
-          <i data-lucide="image" class="w-8 h-8 text-cyan-300"></i>
-          <h3 class="text-sm font-bold text-white">Masukkan Foto (Opsional)</h3>
-        </div>
-        <div id="previewState" class="hidden absolute inset-0 flex p-2 gap-2 h-full w-full bg-black/80 rounded-2xl items-center justify-center">
-          <p class="text-cyan-400 font-bold">Foto Berhasil Dimasukkan!</p>
-        </div>
+        <p id="uploadText" class="text-sm text-gray-400">Masukkan Foto (Opsional)</p>
       </div>
-
-      <div class="relative w-full">
-        <input type="text" id="promptInput" placeholder="Ketik perintah di sini..." class="w-full bg-[#0a0a0f] border-none rounded-2xl px-6 py-5 text-white focus:ring-2 focus:ring-cyan-500/50 text-lg shadow-inner">
-      </div>
-
-      <div id="errorMsg" class="hidden p-4 bg-red-500/10 rounded-xl text-red-400 text-sm"></div>
-
-      <div class="flex gap-4 items-center w-full mt-2">
-        <button id="generateBtn" class="flex-1 flex items-center justify-center gap-3 py-4 rounded-xl font-bold text-lg bg-gradient-to-r from-cyan-600 to-purple-600 text-white shadow-lg hover:opacity-90 active:scale-95 transition-all">
-          Generate Image
-        </button>
-        <button class="px-8 py-4 bg-[#0a0a0f] rounded-xl font-semibold text-gray-400" onclick="location.reload()">Reset</button>
-      </div>
+      <input type="text" id="promptInput" placeholder="Ketik perintah (contoh: Gambar Kuda)" class="w-full bg-black/40 border-none rounded-xl px-4 py-4 text-white outline-none ring-1 ring-white/10 focus:ring-cyan-500">
+      <div id="errorMsg" class="hidden p-3 bg-red-500/20 text-red-400 text-xs rounded-xl"></div>
+      <button id="generateBtn" class="w-full py-4 bg-gradient-to-r from-cyan-600 to-purple-600 rounded-xl font-bold active:scale-95 transition-all">Generate Image</button>
     </div>
-
-    <div class="w-full mt-6" id="result-section">
-      <div id="loadingState" class="hidden w-full aspect-video bg-[#0a0a0f] rounded-3xl flex flex-col items-center justify-center gap-4">
-          <div class="w-12 h-12 border-4 border-t-cyan-400 border-gray-800 rounded-full animate-spin"></div>
-          <p class="text-purple-400 font-medium animate-pulse">SOIB sedang bekerja...</p>
-      </div>
-      <div id="successState" class="hidden w-full flex flex-col gap-4 animate-[fadeIn_0.5s_ease-out]">
-          <img id="resultImage" src="" class="w-full rounded-3xl shadow-2xl border border-white/10">
-          <button onclick="downloadImg()" class="py-4 bg-white/10 hover:bg-white/20 rounded-xl font-bold text-cyan-400 transition-all">Unduh Gambar</button>
-      </div>
+    <div id="loadingState" class="hidden text-center text-cyan-400 animate-pulse">Sedang memproses...</div>
+    <div id="successState" class="hidden flex flex-col gap-4">
+      <img id="resultImage" class="w-full rounded-2xl shadow-2xl border border-white/10">
+      <button onclick="downloadImg()" class="py-3 bg-white/10 rounded-xl font-bold">Unduh Gambar</button>
     </div>
   </main>
-
   <script>
     lucide.createIcons();
-    
-    // API KEY SUDAH DIGABUNG LANGSUNG
-    const apiKey = "AIzaSyC7AOC1PerV_ddO08eAqJuFq6AthhsO-94"; 
-
+    const apiKey = "AIzaSyC7AOC1PerV_ddO08eAqJuFq6AthhsO-94";
     const fileInput = document.getElementById('fileInput');
-    const promptInput = document.getElementById('promptInput');
     const generateBtn = document.getElementById('generateBtn');
     let uploadedFiles = [];
 
     fileInput.addEventListener('change', (e) => {
-        uploadedFiles = Array.from(e.target.files).slice(0, 2);
-        if(uploadedFiles.length > 0) {
-          document.getElementById('previewState').classList.remove('hidden');
-        }
+      uploadedFiles = Array.from(e.target.files);
+      document.getElementById('uploadText').innerText = "Foto Terpilih!";
     });
 
     const fileToB64 = (f) => new Promise(res => { const r = new FileReader(); r.onload = () => res(r.result.split(',')[1]); r.readAsDataURL(f); });
 
     generateBtn.addEventListener('click', async () => {
-        const prompt = promptInput.value.trim();
-        if(!prompt) return alert("Ketik perintah dulu Mas Sohib!");
-        
-        document.getElementById('loadingState').classList.remove('hidden');
-        document.getElementById('successState').classList.add('hidden');
-        document.getElementById('errorMsg').classList.add('hidden');
+      if(!document.getElementById('promptInput').value) return alert("Ketik perintah dulu!");
+      document.getElementById('loadingState').classList.remove('hidden');
+      document.getElementById('successState').classList.add('hidden');
+      document.getElementById('errorMsg').classList.add('hidden');
 
-        try {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-            let parts = [{ text: prompt }];
+      try {
+        // GANTI MODEL KE 1.5 FLASH UNTUK KESTABILAN MODALITAS IMAGE
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        let parts = [{ text: "Buatkan gambar realistis berdasarkan: " + document.getElementById('promptInput').value }];
+        for(let f of uploadedFiles) parts.push({ inlineData: { mimeType: f.type, data: await fileToB64(f) } });
 
-            if (uploadedFiles.length > 0) {
-                for(let f of uploadedFiles) {
-                  parts.push({ inlineData: { mimeType: f.type, data: await fileToB64(f) } });
-                }
-            }
-
-            const res = await fetch(url, { 
-                method: 'POST', 
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ contents: [{ parts }], generationConfig: { responseModalities: ["IMAGE"] } }) 
-            });
-            
-            const data = await res.json();
-            if(data.error) throw new Error(data.error.message);
-            
-            const imgPart = data.candidates[0].content.parts.find(p => p.inlineData);
-            if(!imgPart) throw new Error("AI tidak mengirim gambar, coba ganti kalimat perintahnya.");
-
-            document.getElementById('resultImage').src = `data:${imgPart.inlineData.mimeType};base64,${imgPart.inlineData.data}`;
-            document.getElementById('successState').classList.remove('hidden');
-            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-        } catch (e) {
-            document.getElementById('errorMsg').textContent = "Waduh, ada kendala: " + e.message;
-            document.getElementById('errorMsg').classList.remove('hidden');
-        } finally {
-            document.getElementById('loadingState').classList.add('hidden');
-        }
+        const res = await fetch(url, { 
+          method: 'POST', 
+          body: JSON.stringify({ contents: [{ parts }], generationConfig: { responseModalities: ["IMAGE"] } }) 
+        });
+        const data = await res.json();
+        if(data.error) throw new Error(data.error.message);
+        const img = data.candidates[0].content.parts.find(p => p.inlineData);
+        document.getElementById('resultImage').src = `data:${img.inlineData.mimeType};base64,${img.inlineData.data}`;
+        document.getElementById('successState').classList.remove('hidden');
+      } catch (e) {
+        document.getElementById('errorMsg').innerText = "Waduh: " + e.message;
+        document.getElementById('errorMsg').classList.remove('hidden');
+      } finally {
+        document.getElementById('loadingState').classList.add('hidden');
+      }
     });
-
-    window.downloadImg = () => { const a = document.createElement('a'); a.href = document.getElementById('resultImage').src; a.download = "soib-ai-hasil.png"; a.click(); }
+    window.downloadImg = () => { const a = document.createElement('a'); a.href = document.getElementById('resultImage').src; a.download = "soib-ai.png"; a.click(); }
   </script>
 </body>
 </html>
