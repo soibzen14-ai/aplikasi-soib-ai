@@ -8,134 +8,130 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
     @keyframes shimmer { 100% { transform: translateX(50%); } }
-    @keyframes scanline {
-      0% { top: 0; opacity: 0; }
-      10% { opacity: 1; }
-      90% { opacity: 1; }
-      100% { top: 100%; opacity: 0; }
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes shine { 100% { left: 200%; } }
+    @keyframes scanline { 0% { top: 0; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
   </style>
 </head>
-<body class="bg-gradient-to-br from-[#2e1065] via-[#0a0514] to-[#1e0a3c] text-white font-sans min-h-screen relative overflow-x-hidden selection:bg-purple-500/30">
+<body class="bg-gradient-to-br from-[#2e1065] via-[#0a0514] to-[#1e0a3c] text-white font-sans min-h-screen relative">
   
-  <div class="fixed inset-0 z-0 pointer-events-none">
-    <div class="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-fuchsia-900/20 blur-[120px]"></div>
-    <div class="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-purple-900/30 blur-[120px]"></div>
-    <div class="absolute top-[40%] left-[50%] translate-x-[-50%] w-[80%] h-[20%] rounded-full bg-indigo-600/15 blur-[150px]"></div>
-  </div>
-
   <header class="fixed top-0 w-full z-50 bg-black/40 backdrop-blur-xl">
     <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-center">
       <div class="flex items-center gap-2">
         <i data-lucide="zap" class="w-5 h-5 text-cyan-400"></i>
-        <h1 class="text-xl font-bold tracking-widest uppercase bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-purple-500">Soib Ai</h1>
+        <h1 class="text-xl font-bold tracking-widest bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-purple-500">SOIB AI</h1>
       </div>
     </div>
   </header>
 
   <main class="relative z-10 max-w-5xl mx-auto px-6 pt-28 pb-16 flex flex-col gap-6 items-center">
     <div class="w-full max-w-3xl bg-white/[0.02] rounded-3xl p-6 md:p-8 backdrop-blur-md shadow-2xl flex flex-col gap-8 relative overflow-hidden">
-      <div class="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-1/2 bg-cyan-500/10 blur-[100px] pointer-events-none rounded-full"></div>
-
-      <div class="flex justify-center w-full relative z-10">
-        <div class="inline-flex items-center gap-2 px-4 py-2 bg-black/40 rounded-full backdrop-blur-md">
+      
+      <div class="flex justify-center w-full">
+        <div class="inline-flex items-center gap-2 px-4 py-2 bg-black/40 rounded-full">
           <i data-lucide="wand-2" class="w-4 h-4 text-purple-400"></i>
-          <span class="text-sm font-medium text-gray-300">Mode Aktif: <span id="modeText" class="text-cyan-400 font-bold">Teks ke Gambar AI</span></span>
+          <span class="text-sm font-medium text-gray-300">Status: <span class="text-cyan-400 font-bold">Siap Tempur</span></span>
         </div>
       </div>
 
-      <div id="dropzone" class="relative w-full h-32 transition-all duration-500 flex flex-col items-center justify-center cursor-pointer group" onclick="document.getElementById('fileInput').click()">
+      <div id="dropzone" class="relative w-full h-32 transition-all flex flex-col items-center justify-center cursor-pointer border-2 border-dashed border-white/10 rounded-2xl hover:bg-white/5" onclick="document.getElementById('fileInput').click()">
         <input type="file" id="fileInput" class="hidden" multiple accept="image/*">
-        <div id="uploadEmptyState" class="relative w-full h-full rounded-2xl bg-[#0a0a0f]/80 backdrop-blur-xl overflow-hidden shadow-inner">
-            <div class="relative h-full w-full flex flex-col items-center justify-center gap-3">
-              <div class="relative p-3 rounded-full bg-gradient-to-tr from-cyan-900/40 to-purple-900/40 shadow-2xl"><i data-lucide="upload-cloud" class="w-8 h-8 text-cyan-300"></i></div>
-              <h3 class="text-lg font-bold text-white tracking-wide">Masukkan Foto</h3>
-            </div>
+        <div id="uploadText" class="flex flex-col items-center gap-2">
+          <i data-lucide="image" class="w-8 h-8 text-cyan-300"></i>
+          <h3 class="text-sm font-bold text-white">Masukkan Foto (Opsional)</h3>
         </div>
-        <div id="previewState" class="hidden absolute inset-0 flex flex-col md:flex-row p-1 gap-4 h-full w-full"></div>
-      </div>
-
-      <div class="relative w-full z-10">
-        <div class="absolute -inset-1 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 rounded-[1.5rem] blur opacity-50"></div>
-        <div class="relative">
-          <input type="text" id="promptInput" placeholder="Ketik prompt..." class="w-full bg-[#0a0a0f] border-none rounded-2xl pl-6 pr-14 py-5 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/50 text-lg shadow-inner">
-          <i data-lucide="sparkles" id="promptIcon" class="absolute right-6 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-600"></i>
+        <div id="previewState" class="hidden absolute inset-0 flex p-2 gap-2 h-full w-full bg-black/80 rounded-2xl items-center justify-center">
+          <p class="text-cyan-400 font-bold">Foto Berhasil Dimasukkan!</p>
         </div>
       </div>
 
-      <div class="flex gap-4 items-center w-full mt-2 z-10">
-        <button id="generateBtn" disabled class="flex-1 flex items-center justify-center gap-3 py-4 rounded-xl font-bold text-lg transition-all group bg-white/5 text-gray-500">
-          <span id="btnText">Generate Image</span>
+      <div class="relative w-full">
+        <input type="text" id="promptInput" placeholder="Ketik perintah di sini..." class="w-full bg-[#0a0a0f] border-none rounded-2xl px-6 py-5 text-white focus:ring-2 focus:ring-cyan-500/50 text-lg shadow-inner">
+      </div>
+
+      <div id="errorMsg" class="hidden p-4 bg-red-500/10 rounded-xl text-red-400 text-sm"></div>
+
+      <div class="flex gap-4 items-center w-full mt-2">
+        <button id="generateBtn" class="flex-1 flex items-center justify-center gap-3 py-4 rounded-xl font-bold text-lg bg-gradient-to-r from-cyan-600 to-purple-600 text-white shadow-lg hover:opacity-90 active:scale-95 transition-all">
+          Generate Image
         </button>
-        <button id="resetBtn" class="px-8 py-4 bg-[#0a0a0f] rounded-xl font-semibold text-gray-400">Reset</button>
+        <button class="px-8 py-4 bg-[#0a0a0f] rounded-xl font-semibold text-gray-400" onclick="location.reload()">Reset</button>
       </div>
     </div>
 
     <div class="w-full mt-6" id="result-section">
-      <div id="loadingState" class="hidden w-full aspect-[21/9] bg-[#0a0a0f] rounded-3xl overflow-hidden relative shadow-2xl flex flex-col items-center justify-center gap-4">
-          <p class="text-purple-400 font-medium animate-pulse">Soib sedang bekerja...</p>
+      <div id="loadingState" class="hidden w-full aspect-video bg-[#0a0a0f] rounded-3xl flex flex-col items-center justify-center gap-4">
+          <div class="w-12 h-12 border-4 border-t-cyan-400 border-gray-800 rounded-full animate-spin"></div>
+          <p class="text-purple-400 font-medium animate-pulse">SOIB sedang bekerja...</p>
       </div>
-      <div id="successState" class="hidden w-full flex flex-col gap-4">
-        <div class="w-full relative group rounded-3xl overflow-hidden bg-black" onclick="openModal()">
-          <img id="resultImage" src="" class="w-full h-auto max-h-[70vh] object-contain">
-        </div>
+      <div id="successState" class="hidden w-full flex flex-col gap-4 animate-[fadeIn_0.5s_ease-out]">
+          <img id="resultImage" src="" class="w-full rounded-3xl shadow-2xl border border-white/10">
+          <button onclick="downloadImg()" class="py-4 bg-white/10 hover:bg-white/20 rounded-xl font-bold text-cyan-400 transition-all">Unduh Gambar</button>
       </div>
     </div>
   </main>
 
-  <div id="imageModal" class="hidden fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex-col items-center justify-center p-8" onclick="closeModal()">
-    <img id="modalImage" src="" class="max-w-full max-h-[85vh] object-contain rounded-xl">
-  </div>
-
   <script>
     lucide.createIcons();
-    const apiKey = ""AIzaSyC7AOC1PerV_ddO08eAqJuFq6AthhsO-94; 
-    let uploadedFiles = [];
-    let finalImageBase64 = null;
+    
+    // API KEY SUDAH DIGABUNG LANGSUNG
+    const apiKey = "AIzaSyC7AOC1PerV_ddO08eAqJuFq6AthhsO-94"; 
 
     const fileInput = document.getElementById('fileInput');
     const promptInput = document.getElementById('promptInput');
     const generateBtn = document.getElementById('generateBtn');
+    let uploadedFiles = [];
 
-    fileInput.addEventListener('change', (e) => { uploadedFiles = Array.from(e.target.files).slice(0, 2); updateUI(); });
-    promptInput.addEventListener('input', updateUI);
-
-    function updateUI() {
-        const hasInput = uploadedFiles.length > 0 || promptInput.value.trim().length > 0;
-        generateBtn.disabled = !hasInput;
-        generateBtn.className = hasInput ? "flex-1 flex items-center justify-center gap-3 py-4 rounded-xl font-bold text-lg bg-gradient-to-r from-cyan-600 to-purple-600 text-white" : "flex-1 flex items-center justify-center gap-3 py-4 rounded-xl font-bold text-lg bg-white/5 text-gray-500";
-        
-        if (uploadedFiles.length > 0) {
-            document.getElementById('dropzone').classList.replace('h-32', 'h-48');
-            document.getElementById('uploadEmptyState').classList.add('hidden');
-            document.getElementById('previewState').classList.remove('hidden');
-            document.getElementById('previewState').innerHTML = uploadedFiles.map(f => `<div class="relative flex-1 h-full rounded-2xl overflow-hidden bg-black"><img src="${URL.createObjectURL(f)}" class="w-full h-full object-cover opacity-90"></div>`).join('');
-        } else {
-            document.getElementById('dropzone').classList.replace('h-48', 'h-32');
-            document.getElementById('uploadEmptyState').classList.remove('hidden');
-            document.getElementById('previewState').classList.add('hidden');
+    fileInput.addEventListener('change', (e) => {
+        uploadedFiles = Array.from(e.target.files).slice(0, 2);
+        if(uploadedFiles.length > 0) {
+          document.getElementById('previewState').classList.remove('hidden');
         }
-    }
-
-    generateBtn.addEventListener('click', () => {
-        document.getElementById('loadingState').classList.remove('hidden');
-        setTimeout(() => {
-            finalImageBase64 = `https://picsum.photos/seed/${Math.random()}/1200/800`;
-            document.getElementById('resultImage').src = finalImageBase64;
-            document.getElementById('modalImage').src = finalImageBase64;
-            document.getElementById('loadingState').classList.add('hidden');
-            document.getElementById('successState').classList.remove('hidden');
-        }, 2000);
     });
 
-    window.openModal = () => document.getElementById('imageModal').style.display = 'flex';
-    window.closeModal = () => document.getElementById('imageModal').style.display = 'none';
-    document.getElementById('resetBtn').addEventListener('click', () => location.reload());
+    const fileToB64 = (f) => new Promise(res => { const r = new FileReader(); r.onload = () => res(r.result.split(',')[1]); r.readAsDataURL(f); });
+
+    generateBtn.addEventListener('click', async () => {
+        const prompt = promptInput.value.trim();
+        if(!prompt) return alert("Ketik perintah dulu Mas Sohib!");
+        
+        document.getElementById('loadingState').classList.remove('hidden');
+        document.getElementById('successState').classList.add('hidden');
+        document.getElementById('errorMsg').classList.add('hidden');
+
+        try {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+            let parts = [{ text: prompt }];
+
+            if (uploadedFiles.length > 0) {
+                for(let f of uploadedFiles) {
+                  parts.push({ inlineData: { mimeType: f.type, data: await fileToB64(f) } });
+                }
+            }
+
+            const res = await fetch(url, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contents: [{ parts }], generationConfig: { responseModalities: ["IMAGE"] } }) 
+            });
+            
+            const data = await res.json();
+            if(data.error) throw new Error(data.error.message);
+            
+            const imgPart = data.candidates[0].content.parts.find(p => p.inlineData);
+            if(!imgPart) throw new Error("AI tidak mengirim gambar, coba ganti kalimat perintahnya.");
+
+            document.getElementById('resultImage').src = `data:${imgPart.inlineData.mimeType};base64,${imgPart.inlineData.data}`;
+            document.getElementById('successState').classList.remove('hidden');
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        } catch (e) {
+            document.getElementById('errorMsg').textContent = "Waduh, ada kendala: " + e.message;
+            document.getElementById('errorMsg').classList.remove('hidden');
+        } finally {
+            document.getElementById('loadingState').classList.add('hidden');
+        }
+    });
+
+    window.downloadImg = () => { const a = document.createElement('a'); a.href = document.getElementById('resultImage').src; a.download = "soib-ai-hasil.png"; a.click(); }
   </script>
 </body>
 </html>
