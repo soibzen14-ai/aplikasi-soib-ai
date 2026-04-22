@@ -19,12 +19,11 @@
 
   <main class="max-w-xl mx-auto px-6 py-10 flex flex-col gap-6">
     <div class="glass p-8 rounded-[2.5rem] flex flex-col gap-6 shadow-2xl animate-[fadeIn_0.5s_ease-out]">
-      
-      <div id="dropzone" class="relative h-44 bg-black/40 border-2 border-dashed border-white/10 rounded-3xl flex flex-col items-center justify-center cursor-pointer overflow-hidden hover:bg-black/60 transition-all" onclick="document.getElementById('fileInput').click()">
+      <div id="dropzone" class="relative h-44 bg-black/40 border-2 border-dashed border-white/10 rounded-3xl flex flex-col items-center justify-center cursor-pointer overflow-hidden" onclick="document.getElementById('fileInput').click()">
         <input type="file" id="fileInput" class="hidden" accept="image/*">
         <div id="placeholder" class="text-center">
           <i data-lucide="image-plus" class="w-12 h-12 text-cyan-500 mx-auto mb-2"></i>
-          <p class="text-sm font-bold text-gray-400">Pilih Foto Anak / Foto Dasar</p>
+          <p class="text-sm font-bold text-gray-400">Pilih Foto Dasar</p>
         </div>
         <img id="preview" class="hidden absolute inset-0 w-full h-full object-contain p-2">
       </div>
@@ -39,26 +38,24 @@
 
     <div id="load" class="hidden text-center py-10">
       <div class="w-12 h-12 border-4 border-t-cyan-400 border-white/10 rounded-full animate-spin mx-auto mb-4"></div>
-      <p class="text-cyan-400 font-bold animate-pulse">MEMPROSES KARYA MAS SOHIB...</p>
+      <p class="text-cyan-400 font-bold animate-pulse">SEDANG MEMPROSES KARYA MAS SOHIB...</p>
     </div>
 
     <div id="result" class="hidden space-y-4 animate-[fadeIn_0.5s_ease-out]">
       <div class="glass p-2 rounded-[2rem] overflow-hidden">
         <img id="resImg" class="w-full rounded-[1.5rem] shadow-2xl">
       </div>
-      <div class="flex gap-2">
-        <button onclick="downloadImg()" class="flex-1 py-4 bg-cyan-600 rounded-xl font-bold flex items-center justify-center gap-2">
-          <i data-lucide="download" class="w-5 h-5"></i> SIMPAN
-        </button>
-        <button onclick="location.reload()" class="px-6 py-4 bg-white/5 rounded-xl font-bold">RESET</button>
-      </div>
+      <button onclick="downloadImg()" class="w-full py-4 bg-cyan-600 rounded-xl font-bold flex items-center justify-center gap-2">
+        <i data-lucide="download" class="w-5 h-5"></i> SIMPAN GAMBAR
+      </button>
+      <button onclick="location.reload()" class="w-full py-2 text-gray-500 text-sm font-bold">RESET</button>
     </div>
   </main>
 
   <script>
     lucide.createIcons();
     
-    // KUNCI SAKTI MAS SOHIB SUDAH TERPASANG DI SINI:
+    // API KEY MAS SOHIB
     const apiKey = "AIzaSyDDalYexDcYMj_Iwdq9RxLZdxCkiUfxUNQ"; 
 
     const fInput = document.getElementById('fileInput');
@@ -88,8 +85,9 @@
       document.getElementById('result').classList.add('hidden');
 
       try {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-        let parts = [{ text: "Berdasarkan foto yang saya berikan, buatkan gambar realistis sesuai perintah ini: " + pText }];
+        // ALAMAT MESIN YANG SUDAH DIPERBAIKI (v1 bkn v1beta)
+        const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        let parts = [{ text: "Gunakan foto ini sebagai referensi wajah dan buatkan gambar realistis sesuai perintah: " + pText }];
         
         if(base64Data) {
           parts.push({ inlineData: { mimeType: "image/jpeg", data: base64Data } });
@@ -105,7 +103,7 @@
         if(data.error) throw new Error(data.error.message);
         
         const img = data.candidates[0].content.parts.find(p => p.inlineData);
-        if(!img) throw new Error("AI sedang lelah, coba perintah lain.");
+        if(!img) throw new Error("AI tidak merespon gambar, coba ganti kata-katanya.");
 
         document.getElementById('resImg').src = `data:${img.inlineData.mimeType};base64,${img.inlineData.data}`;
         document.getElementById('result').classList.remove('hidden');
