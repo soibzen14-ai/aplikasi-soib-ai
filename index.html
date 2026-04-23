@@ -10,7 +10,6 @@
     body { background-color: #0a0514; color: white; font-family: sans-serif; }
     .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    .neon-border { border: 1px solid rgba(34, 211, 238, 0.3); box-shadow: 0 0 15px rgba(34, 211, 238, 0.1); }
   </style>
 </head>
 <body class="min-h-screen relative overflow-x-hidden">
@@ -29,15 +28,14 @@
 
   <main class="relative z-10 max-w-xl mx-auto px-6 pt-24 pb-16 flex flex-col gap-8">
     
-    <div class="glass p-8 rounded-[2.5rem] flex flex-col gap-8 shadow-2xl animate-[fadeIn_0.6s_ease-out] neon-border">
+    <div class="glass p-8 rounded-[2.5rem] flex flex-col gap-8 shadow-2xl animate-[fadeIn_0.6s_ease-out]">
       
       <div id="dropzone" class="relative min-h-[180px] bg-black/40 border-2 border-dashed border-white/10 rounded-3xl flex flex-col items-center justify-center cursor-pointer transition-all hover:border-cyan-500/50" onclick="document.getElementById('fileInput').click()">
         <input type="file" id="fileInput" class="hidden" accept="image/*">
         
         <div id="placeholder" class="text-center p-4">
           <i data-lucide="image-plus" class="w-12 h-12 text-cyan-400 mx-auto mb-3"></i>
-          <p class="text-lg font-bold">Masukkan Foto</p>
-          <p class="text-xs text-gray-500 mt-1">Pilih foto referensi wajah/objek</p>
+          <p class="text-lg font-bold">Masukkan Foto Referensi</p>
         </div>
 
         <div id="previewContainer" class="hidden absolute inset-0 bg-black flex flex-col items-center justify-center p-2 rounded-3xl">
@@ -47,8 +45,8 @@
       </div>
 
       <div class="space-y-3">
-        <label class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] ml-2">Apa yang ingin Mas buat?</label>
-        <textarea id="prompt" rows="3" placeholder="Contoh: Buat foto ini sedang berada di luar angkasa memakai baju astronot..." class="w-full bg-black/40 border border-white/10 rounded-2xl px-6 py-4 text-white outline-none focus:ring-2 focus:ring-cyan-500/50 text-lg transition-all"></textarea>
+        <label class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] ml-2">Perintah Tambahan:</label>
+        <textarea id="prompt" rows="2" placeholder="Contoh: Naik kuda..." class="w-full bg-black/40 border border-white/10 rounded-2xl px-6 py-4 text-white outline-none focus:ring-2 focus:ring-cyan-500/50 text-lg transition-all"></textarea>
       </div>
 
       <button id="go" class="w-full py-5 bg-gradient-to-r from-cyan-600 to-purple-600 rounded-2xl font-black text-xl shadow-lg active:scale-95 transition-all uppercase tracking-widest">
@@ -58,7 +56,7 @@
 
     <div id="load" class="hidden glass rounded-[2rem] p-10 flex flex-col items-center justify-center gap-6">
       <div class="w-16 h-16 border-4 border-cyan-500/20 border-t-cyan-400 rounded-full animate-spin"></div>
-      <p class="text-cyan-400 font-bold tracking-widest animate-pulse">MEMPROSES KARYA MAS SOHIB...</p>
+      <p id="loadText" class="text-cyan-400 font-bold tracking-widest animate-pulse text-center">MEMPROSES...</p>
     </div>
 
     <div id="result" class="hidden space-y-6 animate-[fadeIn_0.5s_ease-out]">
@@ -78,18 +76,23 @@
   <script>
     lucide.createIcons();
     
+    // Kunci API digunakan khusus untuk membaca gambar
+    const apiKey = "AIzaSyDDalYexDcYMj_Iwdq9RxLZdxCkiUfxUNQ"; 
+
     const fInput = document.getElementById('fileInput');
     const preview = document.getElementById('imagePreview');
     const previewContainer = document.getElementById('previewContainer');
     const placeholder = document.getElementById('placeholder');
     const goBtn = document.getElementById('go');
+    const loadText = document.getElementById('loadText');
+    let base64Data = "";
 
-    // Menampilkan Foto saat dipilih
     fInput.addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (file) {
         const reader = new FileReader();
         reader.onload = (ev) => { 
+          base64Data = ev.target.result.split(',')[1];
           preview.src = ev.target.result; 
           previewContainer.classList.remove('hidden'); 
           placeholder.classList.add('hidden');
@@ -98,31 +101,63 @@
       }
     });
 
-    // Proses Pembuatan Gambar (Menggunakan Engine Flux - Stabil & Gratis)
-    goBtn.addEventListener('click', () => {
+    goBtn.addEventListener('click', async () => {
       const pText = document.getElementById('prompt').value.trim();
-      if(!pText) return alert("Ketik perintahnya dulu ya Mas Sohib!");
+      if(!pText) return alert("Ketik perintahnya dulu ya Mas!");
 
       document.getElementById('load').classList.remove('hidden');
       document.getElementById('result').classList.add('hidden');
 
-      // Menggunakan teknologi Pollinations Flux yang sangat stabil
-      const seed = Math.floor(Math.random() * 1000000);
-      const encodedPrompt = encodeURIComponent(pText + ", cinematic, highly detailed, realistic, masterpiece");
-      const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1080&height=1080&model=flux&seed=${seed}&nologo=true`;
+      try {
+        let finalPrompt = pText;
 
-      const img = new Image();
-      img.src = imageUrl;
-      img.onload = () => {
-        document.getElementById('resImg').src = imageUrl;
+        // Langkah 1: Jika ada foto, minta Gemini mendeskripsikan foto tersebut
+        if(base64Data) {
+            loadText.innerText = "MENGANALISIS FOTO REFERENSI...";
+            const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+            const body = {
+                contents: [{
+                    parts: [
+                        { text: "Describe the exact appearance of the person in this image in one detailed sentence (age, gender, ethnicity, clothing, headwear, colors). English only." },
+                        { inlineData: { mimeType: "image/jpeg", data: base64Data } }
+                    ]
+                }]
+            };
+
+            const geminiRes = await fetch(geminiUrl, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body) });
+            const geminiData = await geminiRes.json();
+            
+            if(geminiData.candidates && geminiData.candidates[0].content.parts[0].text) {
+                const description = geminiData.candidates[0].content.parts[0].text.replace(/\n/g, '').trim();
+                // Gabungkan deskripsi wajah/baju dengan perintah Mas Sohib
+                finalPrompt = description + ", they are " + pText + ", cinematic, 4k, hyper-realistic, highly detailed photography";
+            }
+        } else {
+            finalPrompt = pText + ", cinematic, 4k, highly detailed";
+        }
+
+        // Langkah 2: Minta Pollinations melukis gambar berdasarkan deskripsi gabungan tadi
+        loadText.innerText = "MELUKIS GAMBAR BARU...";
+        const seed = Math.floor(Math.random() * 1000000);
+        const encodedPrompt = encodeURIComponent(finalPrompt);
+        const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1080&height=1080&model=flux&seed=${seed}&nologo=true`;
+
+        const img = new Image();
+        img.src = imageUrl;
+        img.onload = () => {
+          document.getElementById('resImg').src = imageUrl;
+          document.getElementById('load').classList.add('hidden');
+          document.getElementById('result').classList.remove('hidden');
+          window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        };
+        img.onerror = () => {
+          throw new Error("Gagal memuat gambar dari server.");
+        };
+
+      } catch (e) {
+        alert("Waduh Mas, server sedang sibuk. Coba klik tombol Generate sekali lagi!");
         document.getElementById('load').classList.add('hidden');
-        document.getElementById('result').classList.remove('hidden');
-        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-      };
-      img.onerror = () => {
-        alert("Waduh Mas, server sedang penuh. Coba klik tombol Generate sekali lagi!");
-        document.getElementById('load').classList.add('hidden');
-      };
+      }
     });
 
     window.downloadImg = async () => {
@@ -137,4 +172,3 @@
   </script>
 </body>
 </html>
-
